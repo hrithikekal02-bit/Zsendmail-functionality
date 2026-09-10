@@ -1,0 +1,9 @@
+  PERFORM cretae_mail_subject.
+  PERFORM cretae_mail_body_main_subject.
+  PERFORM add_to_cc_dl_main_ids.
+  PERFORM set_mail_signature.
+  PERFORM set_attachment.
+  PERFORM excel_file_heading.
+  PERFORM set_attachment_to_mail.
+  PERFORM add_attachment.
+  PERFORM send_mail_2.
