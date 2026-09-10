@@ -1,0 +1,111 @@
+CALL FUNCTION 'OWN_LOGICAL_SYSTEM_GET'
+    IMPORTING
+      own_logical_system             = gv_system
+    EXCEPTIONS
+      own_logical_system_not_defined = 1
+      OTHERS                         = 2.
+
+  IF sy-subrc <> 0.
+    gv_system = 'NA'.
+  ENDIF.
+
+*-- Time to add in subject as well as in body.
+  gv_time = sy-uzeit.
+
+  IF gt_final IS NOT INITIAL.
+
+*"--Del begin of SAPSUP-39205 HEU4013 21.04.2026
+*    gv_subject =
+*              |{ gv_system+0(3) }| &&
+*              |: | &&
+*              TEXT-018  && | | &&
+*               |{ gv_dateout+6(2) }.| &&
+*              |{ gv_dateout+4(2) }.| &&
+*              |{ gv_dateout+0(4) }| &&
+*              TEXT-019  && | | &&
+*              |{ gv_todate2+6(2) }.| &&
+*              |{ gv_todate2+4(2) }.| &&
+*              |{ gv_todate2+0(4) }.|.
+*"--Del end of SAPSUP-39205 HEU4013 21.04.2026
+
+*"++Ins begin of SAPSUP-39205 HEU4013 21.04.2026
+    IF p_strlo = 'US00'.
+
+      gv_subject =
+            |{ gv_system+0(3) }| &&
+            |: | &&
+            TEXT-038  && | | &&
+             |{ gv_dateout+6(2) }.| &&
+            |{ gv_dateout+4(2) }.| &&
+            |{ gv_dateout+0(4) }| &&
+            TEXT-019  && | | &&
+            |{ gv_todate2+6(2) }.| &&
+            |{ gv_todate2+4(2) }.| &&
+            |{ gv_todate2+0(4) }.|.
+
+    ELSEIF p_strlo = 'NL00'.
+
+      gv_subject =
+          |{ gv_system+0(3) }| &&
+          |: | &&
+          TEXT-039  && | | &&
+           |{ gv_dateout+6(2) }.| &&
+          |{ gv_dateout+4(2) }.| &&
+          |{ gv_dateout+0(4) }| &&
+          TEXT-019  && | | &&
+          |{ gv_todate2+6(2) }.| &&
+          |{ gv_todate2+4(2) }.| &&
+          |{ gv_todate2+0(4) }.|.
+
+    ENDIF.
+*"++Ins end of SAPSUP-39205 HEU4013 21.04.2026.
+  ELSE.
+*"--Del begin of SAPSUP-39205 HEU4013 22.04.2026
+*    gv_subject =
+*            |{ gv_system+0(3) }| &&
+*            |: | &&
+*            TEXT-036  && | | &&
+*             |{ sy-datum+6(2) }.| &&
+*            |{  sy-datum+4(2) }.| &&
+*            |{  sy-datum+0(4) }|.
+*"--Del end of SAPSUP-39205 HEU4013 22.04.2026
+
+* "--Ins begin of SAPSUP-39205 HEU4013 22.04.2026
+    IF p_strlo = 'US00'.
+
+      gv_subject =
+            |{ gv_system+0(3) }| &&
+            |: | &&
+            TEXT-040  && | | &&
+             |{ gv_dateout+6(2) }.| &&
+            |{ gv_dateout+4(2) }.| &&
+            |{ gv_dateout+0(4) }| &&
+            TEXT-019  && | | &&
+            |{ gv_todate2+6(2) }.| &&
+            |{ gv_todate2+4(2) }.| &&
+            |{ gv_todate2+0(4) }.|.
+
+    ELSEIF p_strlo = 'NL00'.
+
+      gv_subject =
+          |{ gv_system+0(3) }| &&
+          |: | &&
+          TEXT-041  && | | &&
+           |{ gv_dateout+6(2) }.| &&
+          |{ gv_dateout+4(2) }.| &&
+          |{ gv_dateout+0(4) }| &&
+          TEXT-019  && | | &&
+          |{ gv_todate2+6(2) }.| &&
+          |{ gv_todate2+4(2) }.| &&
+          |{ gv_todate2+0(4) }.|.
+
+    ENDIF.
+* "--Ins End of SAPSUP-39205 HEU4013 22.04.2026
+  ENDIF.
+
+  go_send_request = cl_bcs=>create_persistent( ).
+
+*-- Set mail subject.
+  CALL METHOD go_send_request->set_message_subject
+    EXPORTING
+      ip_subject = gv_subject.
